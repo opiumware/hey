@@ -1,0 +1,135 @@
+import os
+import json
+import requests
+import time
+
+def fetch_authorized_keys(url):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        keys = response.text.splitlines()
+        return keys
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching authorized keys: {e}")
+        return []
+
+def is_key_authorized(user_key, authorized_keys):
+    return user_key in authorized_keys
+
+def create_deso_settings(folder_path):
+    settings = {
+        "DFIntTaskSchedulerTargetFps": "99999",
+        "DFIntS2PhysicsSenderRate": "2"
+    }
+    with open(os.path.join(folder_path, "ClientAppSettings.json"), "w") as file:
+        json.dump(settings, file)
+
+def create_cham_settings(folder_path):
+    settings = {
+        "DFIntTaskSchedulerTargetFps": "99999",
+        "DFFlagDebugVisualizationImprovements": "True",
+        "DFFlagDebugVisualizeAllPropertyChanges": "True",
+        "DFFlagDebugVisualizerTrackRotationPredictions": "True",
+        "DFFlagDebugEnableInterpolationVisualizer": "True",
+        "DFFlagDebugDrawBroadPhaseAABBs": "False"
+    }
+    with open(os.path.join(folder_path, "ClientAppSettings.json"), "w") as file:
+        json.dump(settings, file)
+
+def create_both_settings(folder_path):
+    settings = {
+        "DFIntTaskSchedulerTargetFps": "99999",
+        "DFFlagDebugVisualizationImprovements": "True",
+        "DFFlagDebugVisualizeAllPropertyChanges": "True",
+        "DFFlagDebugVisualizerTrackRotationPredictions": "True",
+        "DFFlagDebugEnableInterpolationVisualizer": "True",
+        "DFFlagDebugDrawBroadPhaseAABBs": "False",
+        "DFIntS2PhysicsSenderRate": "2"
+    }
+    with open(os.path.join(folder_path, "ClientAppSettings.json"), "w") as file:
+        json.dump(settings, file)
+
+def delete_settings(folder_path):
+    file_path = os.path.join(folder_path, "ClientAppSettings.json")
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print("ClientAppSetting.json deleted.")
+    else:
+        print("ClientAppSetting.json not found.")
+
+def typewriter_effect(text):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(0)
+    print()
+
+def main():
+    loader = """                                                                                
+                         ,%(,/%/,(#(,  ,*.  ./#,.*(*. ,.                        
+                           *#/,.**...,(, ,..#/ .**#**,                          
+                             #(#&##%&&#/%%&#///(#/*.                            
+                          .##/#%&&%##%(#((#//*/(/*,,,                           
+                       .///(###((######(((((((//////***                         
+                     ,/(((((((((((((((#((((/(((((//((//.*                       
+                    /((###(((((((((((((((((((((((#*/(((/.*,                     
+                  ./((###(((##((((((#..  (**((#*(((. ((/*/*/                    
+                 (/(###(.  ((###%%###&&###/. /(#(((///(((/(./,                  
+                #/(#%##((##&#%##%#####,  #(/(((/.(((*(//(/////.                 
+                /(##%(#. ##%%%%%##(#%@#*(#(./((#((((#.(/((((*(/                 
+               .(#%&%(#%%%%&&&%%#####(..##(((((%,#(((,//((//(//                 
+               #(%%&(#%%(%%%&&%&#####%%%(((*(((#%#(((**(/(((///.                
+               #(%&&(%%/%%%%&@@&#%%#%&&*/#(/((####((((/(((((/*(.                
+                .(%&&(#&,%%%%&&&&.%%#%&&@//#(((######((/((((((//                 
+                (%&&#%&%&%%&@@&&##%#%%&@###((((%%%##(#*(((((//*                 
+                 (%&%#&&%&&&@@@@(%%%%&%&/ ##(((%(#####((((((**                  
+                  #%&#&@%&&&@@@&@(#%&&&%&*&####%#####(((##*/.                   
+                   #&&%&*&&&&@@&&&%%&&&&&/.#(##*#####((((((                     
+                     %%%&/@@&@@@@&&%&&&&%(.###&(%##(*(#/.                       
+                       ,%/*@&&&&&@%&&&&&@%###&*%%##*%*                          
+                            .,,*(#(###&%#((%(,                                  
+                                  .&&&&&%%#(                                    
+                                   (&&%%##(/                                    
+                                   %%%%#(((//.                                 
+                                 (##((((//////*.                                
+                                /%%##(((/////(*                                 
+                                  .%@@@&&%#(#,                                  
+                                   .%&&%##((*    
+"""
+    typewriter_effect(loader)
+
+    # Specify the URL for the authorized keys file on GitHub RAW or another source
+    authorized_keys_url = "https://raw.githubusercontent.com/opiumware/hey/main/authorized_keys.txt"
+
+    # Fetch authorized keys from the remote source
+    authorized_keys = fetch_authorized_keys(authorized_keys_url)
+
+    # Get the user key input
+    user_key = input("Enter your key: ")
+
+    # Check if the user is authorized
+    if is_key_authorized(user_key, authorized_keys):
+        user = input("wendigo a hottie\nWhat would you like to do?\n[1] - Desync\n[2] - Esp\n[3] - Both\n[4] - Disable\n")
+
+        home_directory = os.path.expanduser("~")
+        roblox_version_folder = os.path.join(home_directory, "AppData", "Local", "Roblox", "Versions", "version-48a28da848b7420d")
+        folder_path = os.path.join(roblox_version_folder, "ClientSettings")
+
+        # Ensure the folder exists
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        if user == "1":
+            create_deso_settings(folder_path)
+        elif user == "2":
+            create_cham_settings(folder_path)
+        elif user == "3":
+            create_both_settings(folder_path)
+        elif user == "4":
+            delete_settings(folder_path)
+        else:
+            print("Invalid choice. Please choose a valid option.")
+    else:
+        print("Unauthorized access. Please provide a valid key.")
+
+if __name__ == "__main__":
+    main()
